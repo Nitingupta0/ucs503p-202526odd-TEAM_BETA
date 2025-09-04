@@ -202,10 +202,6 @@ The application is architected to support 3D GLB overlays using Three.js and Goo
 - Security headers (Helmet.js)
 - Role-based access control
 
-## Contributing
-
-Arpan Goyal 
-LinkedIn - https://www.linkedin.com/in/arpangoyal97/
 ## License
 
 MIT License - see LICENSE file for details
