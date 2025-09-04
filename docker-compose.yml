@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: smart-navigator-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - smart-navigator-network
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: smart-navigator-backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: development
+      MONGODB_URI: mongodb://admin:password@mongodb:27017/smart-navigator?authSource=admin
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      COOKIE_NAME: smart_navigator_token
+      CORS_ORIGIN: http://localhost:3000
+    depends_on:
+      - mongodb
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - smart-navigator-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: smart-navigator-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      VITE_API_BASE_URL: http://localhost:5000
+      VITE_GOOGLE_MAPS_API_KEY: your-google-maps-api-key
+      VITE_MAP_ID: your-google-maps-map-id
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - smart-navigator-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  smart-navigator-network:
+    driver: bridge
